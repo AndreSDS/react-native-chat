@@ -9,13 +9,15 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.reactnativechat"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.anonymous.reactnativechat"
     },
     "web": {
       "bundler": "metro",
@@ -41,6 +43,12 @@
             "./assets/fonts/Roboto-Bold.ttf",
             "./assets/fonts/Roboto-SemiBold.ttf"
           ]
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Allow Chat Assistant to access your microphone."
         }
       ]
     ],

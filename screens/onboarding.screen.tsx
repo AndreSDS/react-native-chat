@@ -1,7 +1,8 @@
-import { onBoardingData } from "@/configs/constants";
-import { onBoardingDataType } from "@/configs/global";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRef, useState } from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import Feather from "@expo/vector-icons/Feather";
+import { onBoardingData, onBoardingKeys } from "@/configs/constants";
+import { onBoardingDataType } from "@/configs/global";
 import {
   Dimensions,
   NativeScrollEvent,
@@ -11,8 +12,13 @@ import {
   StyleSheet,
   View,
   Text,
+  Pressable,
+  TouchableOpacity,
+  Alert,
 } from "react-native";
-import { scale } from "react-native-size-matters";
+import { scale, verticalScale } from "react-native-size-matters";
+import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export function OnboardingScreen() {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -28,6 +34,18 @@ export function OnboardingScreen() {
     setActiveIndex(index);
   };
 
+  const handleSkip = async () => {
+    const nextIndex = activeIndex + 1;
+    const offset = nextIndex * Dimensions.get("window").width;
+    if (nextIndex < onBoardingData.length) {
+      scrollViewRef.current?.scrollTo({ x: offset, animated: true });
+      setActiveIndex(nextIndex);
+    } else {
+      await AsyncStorage.setItem(onBoardingKeys.isOnboarding, "true");
+      router.push("/(routes)/home");
+    }
+  };
+
   return (
     <LinearGradient
       colors={["#250152", "#000"]}
@@ -37,11 +55,24 @@ export function OnboardingScreen() {
     >
       <StatusBar translucent barStyle="light-content" />
 
+      <Pressable style={styles.header} onPress={handleSkip}>
+        <Text style={styles.headerTitle}>Skip</Text>
+        <Feather
+          name="arrow-right"
+          style={{
+            marginBottom: scale(-5),
+          }}
+          size={scale(18)}
+          color="#fff"
+        />
+      </Pressable>
+
       <ScrollView
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator
         onScroll={handleScroll}
+        ref={scrollViewRef}
       >
         {onBoardingData.map((item: onBoardingDataType, index) => (
           <View key={index} style={styles.slide}>
@@ -59,10 +90,10 @@ export function OnboardingScreen() {
             style={[
               styles.paginationDot,
               {
-                backgroundColor:
-                  index === activeIndex ? "#fff" : "rgba(255, 255, 255, 0.5)",
+                backgroundColor: index === activeIndex ? "#fff" : "#ADADAD",
                 width: index === activeIndex ? scale(10) : scale(8),
                 height: index === activeIndex ? scale(10) : scale(8),
+                opacity: index === activeIndex ? 1 : 0.3,
               },
             ]}
           />
@@ -77,6 +108,21 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+  },
+  header: {
+    position: "absolute",
+    top: verticalScale(50),
+    right: scale(20),
+    flexDirection: "row",
+    alignItems: "center",
+    gap: scale(5),
+    zIndex: 1,
+  },
+  headerTitle: {
+    color: "#fff",
+    fontFamily: "RobotoSemiBold",
+    fontSize: scale(17),
+    fontWeight: "semibold",
   },
   slide: {
     width: Dimensions.get("window").width,
@@ -103,14 +149,14 @@ const styles = StyleSheet.create({
     marginHorizontal: "auto",
   },
   pagination: {
+    position: "absolute",
+    bottom: verticalScale(70),
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    gap: scale(10),
   },
   paginationDot: {
-    borderRadius: "50%",
-    marginHorizontal: scale(5),
-    backgroundColor: "#fff",
-    opacity: 0.5,
+    borderRadius: 100,
   },
 });

@@ -1,26 +1,56 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   StatusBar,
   StyleSheet,
   View,
   Text,
-  TouchableOpacity,
   Image,
   Alert,
-  Pressable,
+  TouchableOpacity,
 } from "react-native";
 import { Audio } from "expo-av";
 import { LinearGradient } from "expo-linear-gradient";
 import { scale, verticalScale } from "react-native-size-matters";
-import { FontAwesome } from "@expo/vector-icons";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { useMutation } from "@tanstack/react-query";
+import { textToSpeech, transcription } from "@/lib/geminiClient";
+import * as Speech from "expo-speech";
+import { Microphone } from "@/components/Microphone";
+import { LottieAnimation } from "@/components/LottieAnimation";
+import { AiSpeaking } from "@/components/AiSpeaking";
+import { Controls } from "@/components/Controls";
+import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 
 export function HomeScreen() {
-  const [textMessage, setTextMessage] = useState("");
   const [isRecording, setIsRecording] = useState(false);
-  const [AIresponse, setAIResponse] = useState(false);
   const [audioMessage, setAudioMessage] = useState<Audio.Recording>();
+  const [isSpeeking, setIsSpeking] = useState(false);
+
+  const {
+    isPending,
+    data: questionText,
+    mutateAsync: sendAudioToWhisper,
+  } = useMutation({
+    mutationFn: async (audioUri: string) => await transcription(audioUri),
+    onSuccess: async ({ response }) => await getApiResponse(response),
+    onError: (error) => {
+      console.error("Failed to transcribe audio: ", error);
+      Alert.alert("Error", "Failed to transcribe audio.");
+    },
+  });
+
+  const {
+    isPending: isLoadingApiResponse,
+    data: apiResponse,
+    mutateAsync: getApiResponse,
+    isSuccess: isSuccessApiResponse,
+  } = useMutation({
+    mutationFn: async (text: string) => await textToSpeech(text),
+    onSuccess: (response) => speakingText(response),
+    onError: (error) => {
+      console.error("Failed to generate speech audio: ", error);
+      Alert.alert("Error", "Failed to generate speech audio.");
+    },
+  });
 
   async function getMicPermissions() {
     try {
@@ -61,7 +91,7 @@ export function HomeScreen() {
     web: {} as any,
   };
 
-  async function starRecording() {
+  async function startRecording() {
     setIsRecording(true);
 
     const hasPermission = await getMicPermissions();
@@ -88,10 +118,18 @@ export function HomeScreen() {
     setIsRecording(false);
     setAudioMessage(undefined);
     try {
-      await audioMessage?.stopAndUnloadAsync();
-      await Audio.setAudioModeAsync({
+      audioMessage?.stopAndUnloadAsync();
+      Audio.setAudioModeAsync({
         allowsRecordingIOS: false,
       });
+    } catch {
+      console.log("Error");
+    }
+  }
+
+  async function handleMessage() {
+    try {
+      await stopRecording();
 
       const uri = audioMessage?.getURI();
 
@@ -100,16 +138,29 @@ export function HomeScreen() {
         return;
       }
 
-      // implementar o gemini aqui
-      // e remover o playback
-      const { sound } = await Audio.Sound.createAsync({ uri });
-
-      await sound.playAsync();
+      await sendAudioToWhisper(uri);
     } catch {
       console.log("Error");
     }
   }
 
+  function speakingText(text: string) {
+    if (!text) {
+      return;
+    }
+
+    Speech.speak(text, {
+      language: "pt-BR",
+      rate: 1,
+      onStart: () => setIsSpeking(true),
+      onDone: () => setIsSpeking(false),
+    });
+  }
+
+  function stopSpeaking() {
+    Speech.stop();
+    setIsSpeking(false);
+  }
 
   return (
     <LinearGradient
@@ -119,18 +170,27 @@ export function HomeScreen() {
       style={styles.conntainer}
     >
       <StatusBar translucent barStyle={"light-content"} />
+
+      <TouchableOpacity style={styles.backArrow} onPress={stopRecording}>
+        <MaterialIcons name="arrow-back-ios" size={scale(20)} color="#fff" />
+      </TouchableOpacity>
+
       <Image source={require("@/assets/main/blur.png")} style={styles.blur1} />
 
-      <TouchableOpacity
-        style={styles.microphone}
-        onPress={audioMessage ? stopRecording : starRecording}
-      >
-        {isRecording ? (
-          <FontAwesome5 name="stop" size={scale(50)} color="#2b3356" />
-        ) : (
-          <FontAwesome name="microphone" size={scale(50)} color="#2b3356" />
-        )}
-      </TouchableOpacity>
+      {isSuccessApiResponse && !isRecording ? (
+        <AiSpeaking stopSpeaking={stopSpeaking} isSpeeking={isSpeeking} />
+      ) : isPending || isLoadingApiResponse ? (
+        <LottieAnimation
+          loop
+          source={require("@/assets/animations/loading-animated.json")}
+        />
+      ) : (
+        <Microphone
+          isRecording={isRecording}
+          stopRecording={handleMessage}
+          startRecording={startRecording}
+        />
+      )}
 
       <Image
         source={require("@/assets/main/purple-blur.png")}
@@ -139,42 +199,19 @@ export function HomeScreen() {
 
       <View style={styles.footer}>
         <Text style={styles.message}>
-          Press the microfone to start recording!
+          {isPending
+            ? ""
+            : questionText?.response ||
+              "Press the microfone to start recording!"}
         </Text>
       </View>
 
-      {!AIresponse && (
-        <View style={styles.controls}>
-          <Pressable
-            style={{
-              flexDirection: "row",
-              alignSelf: "flex-end",
-              zIndex: 1,
-            }}
-            onPress={() => {}}
-          >
-            <MaterialCommunityIcons
-              name="motion-play-outline"
-              size={scale(45)}
-              color="#fff"
-            />
-          </Pressable>
-
-          <Pressable
-            style={{
-              flexDirection: "row",
-              alignSelf: "flex-end",
-              zIndex: 1,
-            }}
-            onPress={() => {}}
-          >
-            <MaterialCommunityIcons
-              name="motion-play-outline"
-              size={scale(45)}
-              color="#fff"
-            />
-          </Pressable>
-        </View>
+      {isSuccessApiResponse && (
+        <Controls
+          isRecording={isRecording}
+          startRecording={startRecording}
+          startSpeaking={() => speakingText(apiResponse)}
+        />
       )}
     </LinearGradient>
   );
@@ -186,20 +223,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  backArrow: {
+    position: "absolute",
+    top: verticalScale(50),
+    left: scale(20),
+  },
   blur1: {
     position: "absolute",
     top: verticalScale(50),
     right: scale(0),
     width: scale(240),
-  },
-  microphone: {
-    width: scale(110),
-    height: scale(110),
-    borderRadius: scale(100),
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 1,
   },
   blur2: {
     position: "absolute",
@@ -221,14 +254,5 @@ const styles = StyleSheet.create({
     fontWeight: "regular",
     textAlign: "center",
     width: scale(260),
-  },
-  controls: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
-    position: "absolute",
-    bottom: verticalScale(30),
-    paddingHorizontal: scale(20),
   },
 });

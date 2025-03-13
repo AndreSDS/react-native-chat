@@ -1,50 +1,69 @@
-# Welcome to your Expo app 👋
+# Aplicativo de Chat Assistente Diário
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Um aplicativo móvel de chat construído com React Native e Expo que serve como seu assistente pessoal diário, ajudando você com perguntas e tarefas ao longo do dia.
 
-## Get started
+## 📱 Funcionalidades
 
-1. Install dependencies
+- Interface de chat em tempo real
+- Respostas alimentadas por IA
+- Roteamento baseado em arquivos com Expo Router
+- Suporte a tema Escuro/Claro
+- Multiplataforma (iOS e Android)
+- Suporte offline
+- Histórico de mensagens
 
-   ```bash
-   npm install
-   ```
+## 🛠 Tecnologias
 
-2. Start the app
+- React Native
+- Expo
+- TypeScript
+- Expo Router
+- AsyncStorage
+- React Native Paper
+- Vector Icons
 
-   ```bash
-    npx expo start
-   ```
+## 🚀 Começando
 
-In the output, you'll find options to open the app in a
+1. Instale o aplicativo Expo Go no seu dispositivo móvel
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+   - [Android Play Store](https://play.google.com/store/apps/details?id=host.exp.exponent)
+   - [iOS App Store](https://apps.apple.com/app/expo-go/id982107779)
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+2. Clone o repositório
 
 ```bash
-npm run reset-project
+git clone https://github.com/AndreSDS/react-native-chat.git
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+3. Instale as dependências
 
-## Learn more
+```bash
+npm install
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+4. Inicie o servidor de desenvolvimento
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npx expo start
+```
 
-## Join the community
+5. Abra o aplicativo:
+   - 📱 Escaneie o código QR com Expo Go (Android) ou aplicativo Câmera (iOS)
+   - 💻 Pressione 'a' para emulador Android
+   - 💻 Pressione 'i' para simulador iOS
 
-Join our community of developers creating universal apps.
+## 💡 Como Usar
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+1. Abra o aplicativo
+2. Digite sua pergunta no campo de chat
+3. Receba respostas instantâneas alimentadas por IA
+4. Acesse seu histórico de chat a qualquer momento
+5. Alterne entre temas escuro/claro para uma visualização confortável
+
+## 📝 Contribuindo
+
+Contribuições são bem-vindas! Sinta-se à vontade para enviar um Pull Request.
+
+## 📄 Licença
+
+Este projeto está licenciado sob a Licença MIT - consulte o arquivo LICENSE para obter detalhes.

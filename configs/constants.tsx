@@ -6,20 +6,23 @@ import { Onboarding3 } from "@/assets/svgs/onboarding3";
 export const onBoardingData: onBoardingDataType[] = [
   {
     id: 1,
-    title: "Welcome to the App",
-    subTitle: "This is the first screen of the onboarding process.",
+    title: "Meet Your AI Companion",
+    subTitle:
+      "Discover the future of communication and knowledge through interactive AI conversations.",
     image: <Onboarding1 />,
   },
   {
     id: 2,
-    title: "Welcome to the App",
-    subTitle: "This is the Second screen of the onboarding process.",
+    title: "Ask, Learn, Evolve",
+    subTitle:
+      "Engage with AI, ask questions, and unlock insights to help you grow in real-time.",
     image: <Onboarding2 />,
   },
   {
     id: 3,
-    title: "Welcome to the App",
-    subTitle: "This is the Third screen of the onboarding process.",
+    title: "Explore your life",
+    subTitle:
+      "Tailor the AI experience to fit your unique needs and get personalized responses anytime.",
     image: <Onboarding3 />,
   },
 ];

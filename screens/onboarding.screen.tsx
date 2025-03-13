@@ -13,8 +13,6 @@ import {
   View,
   Text,
   Pressable,
-  TouchableOpacity,
-  Alert,
 } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
 import { router } from "expo-router";
